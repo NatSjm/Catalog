@@ -8,13 +8,8 @@ use App\Http\Requests\ProductRequest;
 use App\Product;
 use App\Http\Helpers\ProductHelper;
 use App\Filters\ProductFilter;
-//use App\Shampoo;
-//use App\SolidShampoo;
-//use App\Soap;
-//use App\LiquidSoap;
-//use App\Toothpaste;
 use Illuminate\Support\Str;
-//use App\Category;
+
 
 class ProductController extends Controller
 {
@@ -27,40 +22,28 @@ class ProductController extends Controller
 
 
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Request $request, ProductFilter $filters)
     {
-        $filteredProducts = Product::with(['productable', 'category', 'fragrance'])->latest('updated_at')->filter($filters);
-        $products = $filteredProducts->paginate(100);
+        $filteredProducts = Product::with(['productable', 'category', 'fragrance'])->filter($filters);
+        $products = $filteredProducts->orderBy('id', 'desc')->cursorPaginate(12);
         return ProductResource::collection($products);
-      // return $products;
+
 
     }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(ProductRequest $request)
     {
+         $this->authorize('create', Product::class);
          $product = $this->helper->create($request);
 
         return response()->json([
-            'product' => new ProductResource($product)
+            'product' => new ProductResource($product),
+            'user' => auth()->id()
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  Product  $product
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Product $product)
     {
 
@@ -72,17 +55,11 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Requests\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(ProductRequest $request, $id)
     {
-       // return $request->all();
         $product = Product::findOrFail($id);
+        $this->authorize('update', $product);
 
         $product = $this->helper->update($request, $product);
 
@@ -92,14 +69,10 @@ class ProductController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Product $product)
     {
+        $this->authorize('delete', $product);
         $product->productable()->delete();
         $product->delete();
 

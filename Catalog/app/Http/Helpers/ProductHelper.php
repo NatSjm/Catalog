@@ -33,15 +33,9 @@ class ProductHelper
 
     public function update (ProductRequest $request, Product $product) {
 
-       // $prefix = "App\\";
-       // $productableModel = $prefix.$request->type;
-       // $productable = $product->productable();
-
         $productData = $request->only('name', 'description', 'price', 'fragrance_id');
         $productableData = $request->except('fragrance_id', 'category_id', 'name', 'description', 'type', 'price',
             '_method');
-      //  $productable = $productableModel::create($productableData);
-       // $product = $productable->products()->create($productData)->load('productable', 'category', 'fragrance');
 
         $product->productable()->update($productableData);
         $product->update($productData);

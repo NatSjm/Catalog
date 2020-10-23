@@ -36,7 +36,6 @@ Route::delete('/products/{product}', 'ProductController@destroy');
 Route::post('/products', 'ProductController@store');
 Route::put('/products/{product}', 'ProductController@update');
 
-//Route::apiResource('products', 'ProductController')
 
 
 Route::get('/categories', 'CategoryController@index');
