@@ -37,4 +37,27 @@ class ProductFilter
         $this->builder->where('category_id', $value);
     }
 
+    public function fragrance ($value)
+    {
+        $this->builder->where('fragrance_id', $value);
+    }
+
+    public function is_antibacterial ($value)
+    {
+        $this->builder->whereHasMorph('productable',  ['App\Soap', 'App\LiquidSoap'], function (Builder $query) use ($value) {
+            $query->where('is_antibacterial', $value);
+        });
+    }
+
+    public function price ($value)
+    {
+        $priceToStr = $value;
+        $priceToArr = explode('_', $priceToStr);
+        if (is_numeric($priceToArr[0]) && is_numeric($priceToArr[1])) {
+            $this->builder->whereBetween('price', [$priceToArr[0], $priceToArr[1]]);
+        } else {
+            $this->builder->where('price', $priceToArr[0], $priceToArr[1]);
+        }
+    }
+
 }
