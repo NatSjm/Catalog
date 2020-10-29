@@ -5,6 +5,8 @@ namespace App\Filters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
+
+
 class ProductFilter
 {
     protected $builder;
@@ -53,11 +55,26 @@ class ProductFilter
     {
         $priceToStr = $value;
         $priceToArr = explode('_', $priceToStr);
+
         if (is_numeric($priceToArr[0]) && is_numeric($priceToArr[1])) {
             $this->builder->whereBetween('price', [$priceToArr[0], $priceToArr[1]]);
         } else {
             $this->builder->where('price', $priceToArr[0], $priceToArr[1]);
         }
+    }
+
+    public function product_value ($value)
+    {
+        $this->builder->whereHasMorph('productable',  ['App\Shampoo', 'App\Toothpaste', 'App\LiquidSoap'], function (Builder $query) use ($value) {
+
+            $valueToArr = explode('_', $value);
+
+            if (is_numeric($valueToArr[0]) && is_numeric($valueToArr[1])) {
+                $query->whereBetween('value', [$valueToArr[0], $valueToArr[1]]);
+            } else {
+                $query->where('value', $valueToArr[0], $valueToArr[1]);
+            }
+        });
     }
 
 }
